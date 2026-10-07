@@ -13,7 +13,12 @@ const PLAYER_NAME_KEY = 'gre-vocab-name'
 const SELECTED_GROUP_KEY = 'gre-vocab-selected-group'
 const STREAK_KEY = 'gre-study-streak'
 const THEME_KEY = 'gre-vocab-theme'
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+const API_BASE_URL = (
+  /^https?:\/\//i.test(configuredApiBaseUrl)
+    ? configuredApiBaseUrl
+    : `https://${configuredApiBaseUrl}`
+).replace(/\/+$/, '')
 
 const fetchJson = async (url) => {
   const response = await fetch(url)

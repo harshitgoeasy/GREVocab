@@ -11,6 +11,17 @@ This repository contains a lightweight GRE vocabulary learning app with:
 
 See [docs/quiz-module.md](docs/quiz-module.md) for quiz module responsibilities, API/session contracts, design decisions, and verification commands.
 
+## Deploy on Render
+
+The root-level `render.yaml` defines two services on the `main` branch:
+
+- `gre-vocab-api`: a Python web service rooted at `backend`, with `/api/health` as its health check.
+- `gre-vocab-frontend`: a static Vite site rooted at `frontend`. Its `VITE_API_BASE_URL` is linked to the API service.
+
+To deploy, push the desired commit to `main`, then create a Blueprint in Render and connect this repository. Render will read `render.yaml` and prompt you to create both services. The API runs on Render's free web-service plan and can take a short time to wake after inactivity.
+
+The backend uses Python 3.12 (`backend/.python-version`); the frontend uses Node.js 24.21.0 (`frontend/.node-version`).
+
 ### Backend
 
 ```bash
