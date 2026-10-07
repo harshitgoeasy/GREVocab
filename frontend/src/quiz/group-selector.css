@@ -1,0 +1,648 @@
+/* ============================================================================
+   GROUP SELECTOR COMPONENT STYLES
+   Enhanced with bold typography, shadows, and micro-interactions
+   ============================================================================ */
+
+.group-selector-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  color: #1c211f;
+}
+
+.app-shell.dark .group-selector-container {
+  color: #f3f1e8;
+}
+
+/* ============================================================================
+   HEADER SECTION
+   ============================================================================ */
+
+.selector-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.selector-title {
+  margin: 0 0 12px;
+  font-size: 2.8rem;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #27745c 0%, #e9b949 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: title-fade-in 800ms ease-out;
+}
+
+.app-shell.dark .selector-title {
+  background: linear-gradient(135deg, #69c59a 0%, #e9b949 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes title-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.selector-subtitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #65706b;
+  line-height: 1.4;
+}
+
+.app-shell.dark .selector-subtitle {
+  color: #b9c1ba;
+}
+
+/* ============================================================================
+   GROUPS GRID LAYOUT
+   ============================================================================ */
+
+.groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+  animation: grid-fade-in 600ms ease-out;
+}
+
+@keyframes grid-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================================================
+   GROUP CARD STYLES
+   ============================================================================ */
+
+.group-card {
+  all: unset;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  background: linear-gradient(135deg, #fffdf7 0%, #faf9f4 100%);
+  border: 2px solid #d6ddd5;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  
+  min-height: 220px;
+}
+
+.app-shell.dark .group-card {
+  background: linear-gradient(135deg, #202923 0%, #1a1d1b 100%);
+  border-color: #44514a;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.group-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(39, 116, 92, 0.1) 0%, rgba(233, 185, 73, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.group-card:hover::before {
+  opacity: 1;
+}
+
+.group-card:hover {
+  border-color: #27745c;
+  background: linear-gradient(135deg, #fffdf7 0%, #f5f3ed 100%);
+  box-shadow: 0 16px 48px rgba(39, 116, 92, 0.2);
+  transform: translateY(-8px);
+}
+
+.app-shell.dark .group-card:hover {
+  border-color: #69c59a;
+  background: linear-gradient(135deg, #252a27 0%, #1f2421 100%);
+  box-shadow: 0 16px 48px rgba(105, 197, 154, 0.2);
+}
+
+.group-card:active {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(39, 116, 92, 0.15);
+}
+
+/* Card Header */
+.group-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.group-number {
+  display: inline-block;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #27745c, #1d5a47);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(39, 116, 92, 0.25);
+}
+
+.app-shell.dark .group-number {
+  background: linear-gradient(135deg, #69c59a, #4fb384);
+  box-shadow: 0 4px 12px rgba(105, 197, 154, 0.3);
+}
+
+.group-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  padding: 8px 10px;
+  background: linear-gradient(135deg, #e9b949, #daa630);
+  color: white;
+  border-radius: 10px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(233, 185, 73, 0.3);
+  font-size: 0.85rem;
+  line-height: 1.2;
+}
+
+.group-badge .badge-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Card Content */
+.group-name {
+  margin: 0 0 16px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -0.3px;
+  color: #1c211f;
+}
+
+.app-shell.dark .group-name {
+  color: #f3f1e8;
+}
+
+/* Card Footer */
+.group-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(214, 221, 213, 0.5);
+}
+
+.app-shell.dark .group-card-footer {
+  border-top-color: rgba(68, 81, 74, 0.5);
+}
+
+.progress-indicator {
+  flex: 1;
+}
+
+.progress-bar {
+  display: block;
+  height: 4px;
+  background: linear-gradient(90deg, #27745c 0%, #e9b949 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(39, 116, 92, 0.2);
+  animation: progress-load 2s ease-in-out infinite;
+}
+
+@keyframes progress-load {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.card-cta {
+  display: inline-block;
+  font-weight: 800;
+  color: #27745c;
+  font-size: 1rem;
+  transition: all 200ms ease;
+  letter-spacing: 0.05em;
+}
+
+.app-shell.dark .card-cta {
+  color: #69c59a;
+}
+
+.group-card:hover .card-cta {
+  transform: translateX(4px);
+  color: #1d5a47;
+}
+
+.app-shell.dark .group-card:hover .card-cta {
+  color: #4fb384;
+}
+
+/* ============================================================================
+   QUIZ MODE: GROUP DETAIL VIEW
+   ============================================================================ */
+
+.group-quiz-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.quiz-header-minimal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border-bottom: 2px solid #d6ddd5;
+}
+
+.app-shell.dark .quiz-header-minimal {
+  border-bottom-color: #44514a;
+}
+
+.back-button {
+  align-self: flex-start;
+  padding: 10px 16px;
+  background: transparent;
+  border: 2px solid #d6ddd5;
+  border-radius: 8px;
+  color: #1c211f;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 200ms ease;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.app-shell.dark .back-button {
+  border-color: #44514a;
+  color: #f3f1e8;
+}
+
+.back-button:hover {
+  border-color: #27745c;
+  color: #27745c;
+  background: color-mix(in srgb, #27745c 8%, #fffdf7);
+}
+
+.app-shell.dark .back-button:hover {
+  border-color: #69c59a;
+  color: #69c59a;
+  background: color-mix(in srgb, #69c59a 8%, #1a1d1b);
+}
+
+.quiz-header-minimal h2 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+  color: #1c211f;
+}
+
+.app-shell.dark .quiz-header-minimal h2 {
+  color: #f3f1e8;
+}
+
+.vocab-count {
+  margin: 0;
+  color: #65706b;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.app-shell.dark .vocab-count {
+  color: #b9c1ba;
+}
+
+/* Vocabulary Preview Grid */
+.vocab-grid-preview {
+  padding: 20px;
+}
+
+.vocab-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.vocab-card-skeleton {
+  padding: 16px;
+  background: linear-gradient(135deg, #fffdf7, #faf9f4);
+  border: 2px solid #d6ddd5;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: skeleton-pulse 2s ease-in-out infinite;
+}
+
+.app-shell.dark .vocab-card-skeleton {
+  background: linear-gradient(135deg, #252a27, #1f2421);
+  border-color: #44514a;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.skeleton-word {
+  height: 12px;
+  background: #d6ddd5;
+  border-radius: 4px;
+  width: 80%;
+}
+
+.app-shell.dark .skeleton-word {
+  background: #44514a;
+}
+
+.skeleton-definition {
+  height: 8px;
+  background: #d6ddd5;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.app-shell.dark .skeleton-definition {
+  background: #44514a;
+}
+
+.skeleton-definition:last-child {
+  width: 90%;
+}
+
+/* ============================================================================
+   QUIZ ACTION SECTION
+   ============================================================================ */
+
+.quiz-action-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 28px;
+  background: linear-gradient(135deg, 
+    rgba(39, 116, 92, 0.08) 0%,
+    rgba(233, 185, 73, 0.04) 100%
+  );
+  border: 2px solid #27745c;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(39, 116, 92, 0.1);
+}
+
+.app-shell.dark .quiz-action-section {
+  border-color: #69c59a;
+  background: linear-gradient(135deg, 
+    rgba(105, 197, 154, 0.08) 0%,
+    rgba(233, 185, 73, 0.04) 100%
+  );
+  box-shadow: 0 8px 24px rgba(105, 197, 154, 0.15);
+}
+
+.quiz-config-summary {
+  display: flex;
+  justify-content: space-around;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(255, 253, 247, 0.5);
+  border-radius: 10px;
+  border: 1px solid rgba(214, 221, 213, 0.5);
+}
+
+.app-shell.dark .quiz-config-summary {
+  background: rgba(32, 41, 35, 0.5);
+  border-color: rgba(68, 81, 74, 0.5);
+}
+
+.config-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.config-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #65706b;
+}
+
+.app-shell.dark .config-label {
+  color: #b9c1ba;
+}
+
+.config-value {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #27745c;
+}
+
+.app-shell.dark .config-value {
+  color: #69c59a;
+}
+
+.start-quiz-button {
+  all: unset;
+  padding: 18px 32px;
+  background: linear-gradient(135deg, #27745c 0%, #1d5a47 100%);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 8px 24px rgba(39, 116, 92, 0.3);
+  text-align: center;
+  display: inline-block;
+}
+
+.app-shell.dark .start-quiz-button {
+  background: linear-gradient(135deg, #69c59a 0%, #4fb384 100%);
+  box-shadow: 0 8px 24px rgba(105, 197, 154, 0.3);
+}
+
+.start-quiz-button:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(39, 116, 92, 0.4);
+}
+
+.start-quiz-button:active:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(39, 116, 92, 0.3);
+}
+
+.start-quiz-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   EMPTY STATE
+   ============================================================================ */
+
+.empty-state {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #65706b;
+  font-weight: 600;
+}
+
+.app-shell.dark .empty-state p {
+  color: #b9c1ba;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .selector-title {
+    font-size: 2rem;
+  }
+
+  .groups-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .group-card {
+    padding: 16px;
+    min-height: 180px;
+  }
+
+  .group-name {
+    font-size: 1.1rem;
+  }
+
+  .quiz-header-minimal h2 {
+    font-size: 1.6rem;
+  }
+
+  .vocab-preview-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .quiz-config-summary {
+    flex-wrap: wrap;
+  }
+
+  .config-value {
+    font-size: 1.4rem;
+  }
+
+  .start-quiz-button {
+    padding: 14px 24px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .group-selector-container {
+    padding: 20px 12px;
+  }
+
+  .selector-header {
+    margin-bottom: 32px;
+  }
+
+  .selector-title {
+    font-size: 1.6rem;
+  }
+
+  .groups-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .group-card {
+    padding: 14px;
+    min-height: 160px;
+  }
+
+  .group-name {
+    font-size: 1rem;
+  }
+
+  .group-quiz-container {
+    padding: 20px 12px;
+    gap: 24px;
+  }
+
+  .quiz-header-minimal h2 {
+    font-size: 1.4rem;
+  }
+
+  .vocab-preview-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .quiz-action-section {
+    padding: 20px;
+  }
+
+  .quiz-config-summary {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .start-quiz-button {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+}

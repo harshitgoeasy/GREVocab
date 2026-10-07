@@ -35,6 +35,7 @@ def parse_pdf_to_groups(pdf_text: str):
         entries = []
         current_entry = None
         in_synonyms = False
+        example_open = False
 
         for line in group_lines[1:]:
             if re.match(r'^Group\s+\d+$', line, re.I):
@@ -53,6 +54,7 @@ def parse_pdf_to_groups(pdf_text: str):
                     'example_sentence': '',
                 }
                 in_synonyms = False
+                example_open = False
                 continue
 
             if current_entry is None:
@@ -62,10 +64,12 @@ def parse_pdf_to_groups(pdf_text: str):
             if pos_match:
                 current_entry['part_of_speech'].append(pos_match.group(1).lower())
                 in_synonyms = False
+                example_open = False
                 continue
 
             if line.lower() == 'synonyms:':
                 in_synonyms = True
+                example_open = False
                 continue
 
             if line.startswith('• ') or line.startswith('- '):
@@ -74,6 +78,7 @@ def parse_pdf_to_groups(pdf_text: str):
                     current_entry['synonyms'].append(text_value)
                 else:
                     current_entry['definitions'].append(text_value)
+                example_open = False
                 continue
 
             if in_synonyms:
@@ -81,10 +86,20 @@ def parse_pdf_to_groups(pdf_text: str):
                     current_entry['synonyms'].append(line[2:].strip())
                 else:
                     current_entry['synonyms'].append(line)
+                example_open = False
                 continue
 
-            if not current_entry['example_sentence'] and not line.lower().startswith('synonyms:'):
-                current_entry['example_sentence'] = line
+            if not example_open and current_entry['definitions'] and line[:1].islower():
+                current_entry['definitions'][-1] += ' ' + line
+                continue
+
+            if not line.lower().startswith('synonyms:'):
+                if example_open:
+                    current_entry['example_sentence'] += ' ' + line
+                else:
+                    separator = ' | ' if current_entry['example_sentence'] else ''
+                    current_entry['example_sentence'] += separator + line
+                example_open = True
 
         if current_entry:
             entries.append(current_entry)

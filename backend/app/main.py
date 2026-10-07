@@ -1,10 +1,12 @@
 import random
 from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
 
 from app.data import GROUPS
+from app.quiz import build_quiz
 
 app = FastAPI(title='GRE Vocabulary API', version='0.1.0')
 
@@ -15,6 +17,11 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
+
+class QuizRequest(BaseModel):
+    group_ids: list[int] = Field(min_length=1)
+    question_count: int = Field(ge=1)
 
 
 def _group_summary(group):
@@ -66,6 +73,14 @@ def _build_question(word, group):
 @app.get('/api/health')
 def health_check():
     return {'status': 'ok', 'message': 'GRE vocabulary API is running'}
+
+
+@app.post('/api/quiz')
+def create_quiz(request: QuizRequest):
+    try:
+        return build_quiz(request.group_ids, request.question_count)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
 
 
 @app.get('/groups')

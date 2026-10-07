@@ -9,6 +9,8 @@ This repository contains a lightweight GRE vocabulary learning app with:
 
 ## Quick start
 
+See [docs/quiz-module.md](docs/quiz-module.md) for quiz module responsibilities, API/session contracts, design decisions, and verification commands.
+
 ### Backend
 
 ```bash

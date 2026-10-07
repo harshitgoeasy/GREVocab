@@ -1,6 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import VocabularyReader from './VocabularyReader'
+import QuizSetup from './quiz/QuizSetup'
+import VocabularyQuestion from './quiz/VocabularyQuestion'
+import QuizSummary from './quiz/QuizSummary'
+import ConfirmQuitDialog from './quiz/ConfirmQuitDialog'
+import { useQuizSession } from './quiz/useQuizSession'
+import './quiz/quiz.css'
 
 const STORAGE_KEY = 'gre-vocab-progress'
 const PLAYER_NAME_KEY = 'gre-vocab-name'
@@ -8,7 +14,6 @@ const SELECTED_GROUP_KEY = 'gre-vocab-selected-group'
 const STREAK_KEY = 'gre-study-streak'
 const THEME_KEY = 'gre-vocab-theme'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
-const ROUND_SECONDS = 30
 
 const fetchJson = async (url) => {
   const response = await fetch(url)
@@ -87,11 +92,50 @@ function App() {
   const [studyStreak, setStudyStreak] = useState(0)
   const [loading, setLoading] = useState(true)
   const [readerWords, setReaderWords] = useState([])
-  const [sessionQuestions, setSessionQuestions] = useState([])
-  const [sessionIndex, setSessionIndex] = useState(0)
-  const [selectedAnswer, setSelectedAnswer] = useState('')
-  const [showResult, setShowResult] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(ROUND_SECONDS)
+  const [quizLoading, setQuizLoading] = useState(false)
+  const [quizError, setQuizError] = useState('')
+  const [showQuitConfirmation, setShowQuitConfirmation] = useState(false)
+  const [questionBankGroups, setQuestionBankGroups] = useState([])
+  const [questionBankLoading, setQuestionBankLoading] = useState(false)
+  const questionBankModule = useRef(null)
+
+  const handleQuizOutcome = (result) => {
+    setProgress((current) => {
+      const groupProgress = current[result.group_id] || {}
+      const updated = {
+        ...current,
+        [result.group_id]: {
+          ...groupProgress,
+          score: (groupProgress.score || 0) + (result.outcome === 'correct' ? 1 : 0),
+          attempts: (groupProgress.attempts || 0) + 1,
+        },
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+      return updated
+    })
+
+    setStudyStreak((current) => {
+      const nextStreak = result.outcome === 'correct' ? current + 1 : 0
+      localStorage.setItem(STREAK_KEY, String(nextStreak))
+      return nextStreak
+    })
+  }
+
+  const quizSession = useQuizSession(handleQuizOutcome)
+
+  const loadQuestionBank = async () => {
+    if (questionBankModule.current) return questionBankModule.current
+
+    setQuestionBankLoading(true)
+    try {
+      const module = await import('./quiz/greQuestionBank.js')
+      setQuestionBankGroups(module.getGreQuestionGroups())
+      questionBankModule.current = module
+      return module
+    } finally {
+      setQuestionBankLoading(false)
+    }
+  }
 
   useEffect(() => {
     const savedName = localStorage.getItem(PLAYER_NAME_KEY) || 'Guest Learner'
@@ -134,69 +178,11 @@ function App() {
       .catch(() => setReaderWords([]))
   }, [dashboardState.activeView, dashboardState.selectedGroup])
 
-  useEffect(() => {
-    if (dashboardState.activeView !== 'QUIZ_PRACTICE' && dashboardState.activeView !== 'QUIZ_TIMED') return
-
-    const mode = dashboardState.activeView === 'QUIZ_TIMED' ? 'timed' : 'practice'
-    fetchJson(`${API_BASE_URL}/api/groups/${dashboardState.selectedGroup}/quiz?mode=${mode}`)
-      .then((data) => {
-        const questions = Array.isArray(data) ? data : data.questions || []
-        setSessionQuestions(questions)
-        setSessionIndex(0)
-        setSelectedAnswer('')
-        setShowResult(false)
-        setTimeLeft(ROUND_SECONDS)
-      })
-      .catch(() => {
-        setSessionQuestions([])
-        setSessionIndex(0)
-        setSelectedAnswer('')
-        setShowResult(false)
-      })
-  }, [dashboardState.activeView, dashboardState.selectedGroup])
-
-  useEffect(() => {
-    if (dashboardState.activeView !== 'QUIZ_TIMED' || !sessionQuestions[sessionIndex] || showResult) {
-      if (dashboardState.activeView !== 'QUIZ_TIMED') {
-        setTimeLeft(ROUND_SECONDS)
-      }
-      return
-    }
-
-    setTimeLeft(ROUND_SECONDS)
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer)
-          if (!showResult) {
-            setSelectedAnswer('TIMEOUT')
-            setShowResult(true)
-            const updatedProgress = {
-              ...progress,
-              [dashboardState.selectedGroup]: {
-                ...(progress[dashboardState.selectedGroup] || {}),
-                score: progress[dashboardState.selectedGroup]?.score || 0,
-                attempts: (progress[dashboardState.selectedGroup]?.attempts || 0) + 1,
-              },
-            }
-            setProgress(updatedProgress)
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedProgress))
-          }
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [dashboardState.activeView, dashboardState.selectedGroup, progress, sessionQuestions, sessionIndex, showResult])
-
   const selectedGroup = useMemo(
     () => groups.find((group) => group.id === dashboardState.selectedGroup) || groups[0],
     [groups, dashboardState.selectedGroup],
   )
 
-  const currentQuestion = sessionQuestions[sessionIndex]
   const masteryByGroup = useMemo(() => {
     return groups.reduce((map, group) => {
       const raw = JSON.parse(localStorage.getItem(`vocab_mastery_${group.id}`) || '{}')
@@ -214,10 +200,45 @@ function App() {
   const selectedGroupMastered = selectedGroup ? masteryByGroup[selectedGroup.id] || 0 : 0
   const needReviewCount = selectedGroup ? Math.max((selectedGroup.word_count || 0) - selectedGroupMastered, 0) : 0
 
-  const updateLocalProgress = (updatedProgress) => {
-    setProgress(updatedProgress)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedProgress))
+  const startQuiz = async ({ groupIds, questionCount, timerSeconds, questionType = 'vocabulary' }) => {
+    setQuizLoading(true)
+    setQuizError('')
+    try {
+      if (questionType === 'gre-bank') {
+        const questionBank = await loadQuestionBank()
+        quizSession.start(questionBank.buildGreQuestionSet(groupIds, questionCount), timerSeconds)
+        setDashboardState((current) => ({ ...current, activeView: 'QUIZ_ACTIVE' }))
+        return
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/quiz`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ group_ids: groupIds, question_count: questionCount }),
+      })
+      const payload = await response.json()
+      if (!response.ok) throw new Error(payload.detail || 'Could not prepare this quiz.')
+      if (!Array.isArray(payload.questions) || payload.questions.length === 0) {
+        throw new Error('No quiz questions are available for this selection.')
+      }
+
+      quizSession.start(payload.questions, timerSeconds)
+      setDashboardState((current) => ({ ...current, activeView: 'QUIZ_ACTIVE' }))
+    } catch (error) {
+      setQuizError(error.message || 'Could not prepare this quiz. Please try again.')
+    } finally {
+      setQuizLoading(false)
+    }
   }
+
+  const leaveQuiz = () => {
+    setShowQuitConfirmation(false)
+    quizSession.stop()
+    setDashboardState((current) => ({ ...current, activeView: 'WELCOME' }))
+  }
+
+  const requestQuitQuiz = () => setShowQuitConfirmation(true)
+  const continueQuiz = () => setShowQuitConfirmation(false)
 
   const resetProgress = () => {
     setProgress({})
@@ -231,54 +252,17 @@ function App() {
     })
   }
 
-  const handleAnswer = (answer) => {
-    if (!currentQuestion || showResult) return
-
-    const isCorrect = answer === currentQuestion.definition
-    const updatedProgress = {
-      ...progress,
-      [dashboardState.selectedGroup]: {
-        ...(progress[dashboardState.selectedGroup] || {}),
-        score: (progress[dashboardState.selectedGroup]?.score || 0) + (isCorrect ? 1 : 0),
-        attempts: (progress[dashboardState.selectedGroup]?.attempts || 0) + 1,
-      },
-    }
-
-    updateLocalProgress(updatedProgress)
-    setSelectedAnswer(answer)
-    setShowResult(true)
-
-    if (isCorrect) {
-      const nextStreak = studyStreak + 1
-      setStudyStreak(nextStreak)
-      localStorage.setItem(STREAK_KEY, String(nextStreak))
-    } else {
-      setStudyStreak(0)
-      localStorage.setItem(STREAK_KEY, '0')
-    }
-  }
-
-  const handleNextQuestion = () => {
-    if (!sessionQuestions.length) {
-      setDashboardState((current) => ({ ...current, activeView: 'WELCOME' }))
-      return
-    }
-
-    const nextIndex = sessionIndex + 1
-    if (nextIndex < sessionQuestions.length) {
-      setSessionIndex(nextIndex)
-      setSelectedAnswer('')
-      setShowResult(false)
-      return
-    }
-
-    setDashboardState((current) => ({ ...current, activeView: 'WELCOME' }))
+  const launchQuizSetup = () => {
+    setDashboardState((current) => ({
+      ...current,
+      activeView: 'QUIZ_SETUP',
+    }))
   }
 
   const launchMode = (mode) => {
     setDashboardState((current) => ({
       ...current,
-      activeView: mode,
+      activeView: mode === 'READER' ? 'READER' : 'WELCOME',
     }))
   }
 
@@ -349,7 +333,16 @@ function App() {
   const renderWelcomeBoard = () => (
     <main className="welcome-board">
       <section className="brand-bar">
-        <img src="/batman-logo.svg" alt="Batman logo" className="app-logo" />
+        <div className="dashboard-identity">
+          <img src="/batman-logo.svg" alt="Batman logo" className="app-logo" />
+          <div>
+            <p className="eyebrow">GRE Vocabulary</p>
+            <h1>Study dashboard</h1>
+          </div>
+        </div>
+        <button type="button" className="dashboard-quiz-cta" onClick={launchQuizSetup}>
+          Start a quiz <span aria-hidden="true">→</span>
+        </button>
       </section>
 
       <section className="stats-bar">
@@ -361,6 +354,11 @@ function App() {
         <div className="stat-card">
           <span>Accuracy</span>
           <strong>{accuracyRate}%</strong>
+        </div>
+
+        <div className="stat-card">
+          <span>Correct streak</span>
+          <strong>{studyStreak}</strong>
         </div>
       </section>
 
@@ -376,29 +374,6 @@ function App() {
         <div className="summary-chip">
           <span>Needs review</span>
           <strong>{needReviewCount}</strong>
-        </div>
-      </section>
-
-      <section className="mode-launchpad">
-        <div className="section-header">
-          <div>
-            <p className="eyebrow">Select Intent</p>
-            <h2>Choose your action</h2>
-          </div>
-        </div>
-
-        <div className="mode-grid">
-          <button type="button" className="mode-card" onClick={() => launchMode('QUIZ_PRACTICE')}>
-            <span className="mode-tag">Practice</span>
-            <h3>Standard Practice</h3>
-            <p>Untimed multiple-choice rounds for focused review.</p>
-          </button>
-
-          <button type="button" className="mode-card" onClick={() => launchMode('QUIZ_TIMED')}>
-            <span className="mode-tag">Challenge</span>
-            <h3>Timed Challenge</h3>
-            <p>Fast-paced quiz mode with a 30-second clock.</p>
-          </button>
         </div>
       </section>
 
@@ -433,14 +408,6 @@ function App() {
           </div>
         </div>
 
-        <div className="focus-actions">
-          <button type="button" className="secondary-button" onClick={() => launchMode('QUIZ_PRACTICE')}>
-            Practice
-          </button>
-          <button type="button" className="secondary-button" onClick={() => launchMode('QUIZ_TIMED')}>
-            Timed Challenge
-          </button>
-        </div>
       </section>
 
       <section className="group-board">
@@ -474,74 +441,54 @@ function App() {
     </main>
   )
 
-  const renderQuizView = () => (
-    <main className="quiz-shell">
-      <div className="quiz-topbar">
-        <button type="button" className="secondary-button" onClick={() => setDashboardState((current) => ({ ...current, activeView: 'WELCOME' }))}>
-          ← Back to dashboard
-        </button>
-        <div className="timer-pill">{dashboardState.activeView === 'QUIZ_TIMED' ? `${timeLeft}s` : 'Practice mode'}</div>
-      </div>
-
-      {currentQuestion ? (
-        <div className="card question-card">
-          <div className="question-header">
-            <div>
-              <p className="question-label">Choose the best definition</p>
-              <p className="question-counter">
-                Word {sessionIndex + 1} / {sessionQuestions.length}
-              </p>
-            </div>
-            <button type="button" className="secondary-button small" onClick={() => setDashboardState((current) => ({ ...current, activeView: 'WELCOME' }))}>
-              Exit
-            </button>
-          </div>
-
-          <h3>{currentQuestion.word}</h3>
-          <p className="example">Example: {currentQuestion.example_sentence}</p>
-
-          <div className="choices-grid">
-            {currentQuestion.choices.map((choice) => {
-              const isCorrect = choice === currentQuestion.definition
-              const isSelected = selectedAnswer === choice
-              const showCorrect = showResult && isCorrect
-              const showWrong = showResult && isSelected && !isCorrect
-
-              return (
-                <button
-                  key={choice}
-                  type="button"
-                  className={[ 'choice-button', showCorrect ? 'correct' : '', showWrong ? 'wrong' : '' ].filter(Boolean).join(' ')}
-                  onClick={() => handleAnswer(choice)}
-                  disabled={showResult}
-                >
-                  {choice}
-                </button>
-              )
-            })}
-          </div>
-
-          {showResult && (
-            <div className="result-box">
-              <p>
-                {selectedAnswer === 'TIMEOUT'
-                  ? `Time’s up! `
-                  : selectedAnswer === currentQuestion.definition
-                    ? 'Correct! '
-                    : 'Not quite. '}
-                <strong>{currentQuestion.word}</strong> means: {currentQuestion.definition}
-              </p>
-              <button type="button" className="primary-button" onClick={handleNextQuestion}>
-                {sessionIndex < sessionQuestions.length - 1 ? 'Next word' : 'Return to dashboard'}
-              </button>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="card empty-state">No quiz questions available for this group yet.</div>
-      )}
-    </main>
+  const renderQuizSetup = () => (
+    <QuizSetup
+      groups={groups}
+      questionBankGroups={questionBankGroups}
+      onLoadQuestionBank={loadQuestionBank}
+      initialGroupId={dashboardState.selectedGroup}
+      loading={loading || quizLoading || questionBankLoading}
+      error={quizError}
+      onStart={startQuiz}
+      onCancel={() => setDashboardState((current) => ({ ...current, activeView: 'WELCOME' }))}
+    />
   )
+
+  const renderQuizView = () => {
+    if (quizSession.isComplete) {
+      return (
+        <QuizSummary
+          results={quizSession.results}
+          questionCount={quizSession.questions.length}
+          onReturn={leaveQuiz}
+        />
+      )
+    }
+
+    if (!quizSession.currentQuestion) {
+      return <div className="card empty-state">No quiz questions are available for this selection.</div>
+    }
+
+    return (
+      <div className="quiz-active-view">
+        <div className="quiz-topbar">
+          <button type="button" className="secondary-button" onClick={requestQuitQuiz}>Leave quiz</button>
+        </div>
+        <VocabularyQuestion
+          question={quizSession.currentQuestion}
+          questionNumber={quizSession.questionIndex + 1}
+          questionCount={quizSession.questions.length}
+          timerSeconds={quizSession.timerSeconds}
+          secondsLeft={quizSession.secondsLeft}
+          outcome={quizSession.outcome}
+          selectedAnswer={quizSession.selectedAnswer}
+          advanceIn={quizSession.advanceIn}
+          onAnswer={quizSession.answer}
+          onNext={quizSession.next}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className={`app-shell ${theme}`}>
@@ -567,9 +514,14 @@ function App() {
           onClose={() => setDashboardState((current) => ({ ...current, activeView: 'WELCOME' }))}
         />
       )}
-      {(dashboardState.activeView === 'QUIZ_PRACTICE' || dashboardState.activeView === 'QUIZ_TIMED') && renderQuizView()}
+      {dashboardState.activeView === 'QUIZ_SETUP' && renderQuizSetup()}
+      {dashboardState.activeView === 'QUIZ_ACTIVE' && renderQuizView()}
+      {showQuitConfirmation && dashboardState.activeView === 'QUIZ_ACTIVE' && (
+        <ConfirmQuitDialog onContinue={continueQuiz} onQuit={leaveQuiz} />
+      )}
 
-      <footer className="site-footer">
+      {dashboardState.activeView === 'WELCOME' && (
+        <footer className="site-footer">
         <div className="footer-grid">
           {FOOTER_SECTIONS.map((section) => (
             <div key={section.title} className="footer-column">
@@ -596,7 +548,8 @@ function App() {
             </div>
           ))}
         </div>
-      </footer>
+        </footer>
+      )}
     </div>
   )
 }

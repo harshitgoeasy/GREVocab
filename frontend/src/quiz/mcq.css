@@ -1,0 +1,714 @@
+/* ============================================================================
+   MULTIPLE CHOICE QUESTION COMPONENT STYLES
+   Enhanced with bold typography, shadows, and micro-interactions
+   ============================================================================ */
+
+.mcq-shell {
+  --mcq-primary: #1c211f;
+  --mcq-secondary: #65706b;
+  --mcq-background: #fffdf7;
+  --mcq-border: #d6ddd5;
+  --mcq-accent-gold: #e9b949;
+  --mcq-accent-green: #27745c;
+  --mcq-accent-red: #bd493f;
+  --mcq-accent-blue: #4a90e2;
+  
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: min(100%, 980px);
+  margin: 0 auto;
+  padding: 20px;
+  color: var(--mcq-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Avenir Next', 'Trebuchet MS', sans-serif;
+  background: var(--mcq-background);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
+.app-shell.dark .mcq-shell {
+  --mcq-primary: #f3f1e8;
+  --mcq-secondary: #b9c1ba;
+  --mcq-background: #1a1d1b;
+  --mcq-border: #3a4540;
+  --mcq-accent-gold: #e9b949;
+  --mcq-accent-green: #69c59a;
+  --mcq-accent-red: #ff8a78;
+  --mcq-accent-blue: #64b5f6;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================================================
+   HEADER & PROGRESS SECTION
+   ============================================================================ */
+
+.mcq-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--mcq-border);
+}
+
+.mcq-progress-section {
+  flex: 1;
+}
+
+.mcq-kicker {
+  margin: 0 0 12px;
+  color: var(--mcq-accent-green);
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.mcq-progress-track {
+  height: 6px;
+  background: var(--mcq-border);
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.mcq-progress-bar {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--mcq-accent-green) 0%, var(--mcq-accent-gold) 100%);
+  border-radius: 3px;
+  box-shadow: 0 0 12px rgba(232, 185, 73, 0.4);
+  transition: width 350ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Timer Styles */
+.mcq-timer {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 12px 18px;
+  background: var(--mcq-background);
+  border: 2px solid var(--mcq-border);
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 1.4rem;
+  transition: all 200ms ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.mcq-timer .timer-display {
+  color: var(--mcq-primary);
+  font-size: 1.8rem;
+  min-width: 45px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.mcq-timer .timer-unit {
+  color: var(--mcq-secondary);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.mcq-timer.warning {
+  border-color: var(--mcq-accent-gold);
+  background: color-mix(in srgb, var(--mcq-accent-gold) 5%, var(--mcq-background));
+  box-shadow: 0 0 16px rgba(233, 185, 73, 0.3);
+}
+
+.mcq-timer.warning .timer-display {
+  color: var(--mcq-accent-gold);
+  animation: pulse-timer 1s ease-in-out infinite;
+}
+
+.mcq-timer.urgent {
+  border-color: var(--mcq-accent-red);
+  background: color-mix(in srgb, var(--mcq-accent-red) 8%, var(--mcq-background));
+  box-shadow: 0 0 20px rgba(189, 73, 63, 0.5);
+}
+
+.mcq-timer.urgent .timer-display {
+  color: var(--mcq-accent-red);
+  animation: pulse-timer 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse-timer {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* ============================================================================
+   QUESTION CONTENT SECTION
+   ============================================================================ */
+
+.mcq-question-container {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 0;
+}
+
+.mcq-metadata {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.mcq-group-tag,
+.mcq-type-tag {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: color-mix(in srgb, var(--mcq-accent-green) 12%, var(--mcq-background));
+  color: var(--mcq-accent-green);
+  border: 1px solid color-mix(in srgb, var(--mcq-accent-green) 25%, transparent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.mcq-type-tag {
+  background: color-mix(in srgb, var(--mcq-accent-blue) 12%, var(--mcq-background));
+  color: var(--mcq-accent-blue);
+  border-color: color-mix(in srgb, var(--mcq-accent-blue) 25%, transparent);
+}
+
+.mcq-question-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mcq-prompt {
+  margin: 0;
+  color: var(--mcq-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.3px;
+  padding: 24px;
+  background: linear-gradient(135deg, 
+    color-mix(in srgb, var(--mcq-accent-gold) 4%, var(--mcq-background)) 0%,
+    color-mix(in srgb, var(--mcq-accent-green) 3%, var(--mcq-background)) 100%
+  );
+  border-radius: 12px;
+  border-left: 4px solid var(--mcq-accent-green);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.mcq-timer-bar {
+  height: 4px;
+  background: var(--mcq-border);
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.mcq-timer-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--mcq-accent-green), var(--mcq-accent-gold));
+  transition: width 300ms linear;
+}
+
+.mcq-timer-fill.warning {
+  background: linear-gradient(90deg, var(--mcq-accent-gold), var(--mcq-accent-red));
+}
+
+.mcq-timer-fill.urgent {
+  background: var(--mcq-accent-red);
+  box-shadow: 0 0 8px rgba(189, 73, 63, 0.6);
+}
+
+/* ============================================================================
+   ANSWER CHOICES SECTION
+   ============================================================================ */
+
+.mcq-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mcq-choice-button {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 16px;
+  min-height: 64px;
+  padding: 16px 20px;
+  
+  background: var(--mcq-background);
+  border: 2px solid var(--mcq-border);
+  border-radius: 12px;
+  
+  color: var(--mcq-primary);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+  
+  cursor: pointer;
+  transition: all 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.mcq-choice-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+
+.mcq-choice-button:not(:disabled):hover {
+  border-color: var(--mcq-accent-green);
+  background: color-mix(in srgb, var(--mcq-accent-green) 6%, var(--mcq-background));
+  box-shadow: 0 8px 24px rgba(39, 116, 92, 0.15);
+  transform: translateY(-2px);
+}
+
+.mcq-choice-button:not(:disabled):hover::before {
+  opacity: 1;
+}
+
+.mcq-choice-button.hovered {
+  border-color: var(--mcq-accent-green);
+  box-shadow: 0 12px 32px rgba(39, 116, 92, 0.2);
+}
+
+.mcq-choice-button:active:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(39, 116, 92, 0.25);
+}
+
+/* State: Correct Answer */
+.mcq-choice-button.state-correct {
+  border-color: var(--mcq-accent-green);
+  background: color-mix(in srgb, var(--mcq-accent-green) 12%, var(--mcq-background));
+  box-shadow: 0 8px 20px rgba(39, 116, 92, 0.2);
+}
+
+.mcq-choice-button.state-correct .choice-text {
+  color: var(--mcq-accent-green);
+  font-weight: 700;
+}
+
+/* State: Incorrect Answer */
+.mcq-choice-button.state-incorrect {
+  border-color: var(--mcq-accent-red);
+  background: color-mix(in srgb, var(--mcq-accent-red) 12%, var(--mcq-background));
+  box-shadow: 0 8px 20px rgba(189, 73, 63, 0.2);
+}
+
+.mcq-choice-button.state-incorrect .choice-text {
+  color: var(--mcq-accent-red);
+  font-weight: 700;
+}
+
+/* Disabled State */
+.mcq-choice-button:disabled {
+  cursor: default;
+  opacity: 0.95;
+}
+
+.choice-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--mcq-accent-green), var(--mcq-accent-gold));
+  color: white;
+  font-weight: 800;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(39, 116, 92, 0.3);
+  transition: all 200ms ease;
+}
+
+.mcq-choice-button:not(:disabled):hover .choice-indicator {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(39, 116, 92, 0.4);
+}
+
+.mcq-choice-button.state-correct .choice-indicator {
+  background: linear-gradient(135deg, var(--mcq-accent-green) 0%, #20c997 100%);
+}
+
+.mcq-choice-button.state-incorrect .choice-indicator {
+  background: linear-gradient(135deg, var(--mcq-accent-red) 0%, #ff6b6b 100%);
+}
+
+.choice-text {
+  color: var(--mcq-primary);
+  font-weight: 600;
+  transition: color 200ms ease;
+  word-break: break-word;
+}
+
+.mcq-choice-button:not(:disabled):hover .choice-text {
+  color: var(--mcq-accent-green);
+}
+
+.choice-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--mcq-accent-green);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 800;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(39, 116, 92, 0.3);
+  animation: mark-pop 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.choice-mark.wrong {
+  background: var(--mcq-accent-red);
+  box-shadow: 0 4px 12px rgba(189, 73, 63, 0.3);
+}
+
+@keyframes mark-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================================================
+   FEEDBACK & ACTION SECTIONS
+   ============================================================================ */
+
+.mcq-feedback {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px;
+  border-radius: 12px;
+  border-left: 4px solid var(--mcq-accent-gold);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--mcq-accent-gold) 8%, var(--mcq-background)) 0%,
+    color-mix(in srgb, var(--mcq-accent-green) 4%, var(--mcq-background)) 100%
+  );
+  box-shadow: 0 8px 24px rgba(233, 185, 73, 0.12);
+  animation: feedback-slide-up 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mcq-feedback-correct {
+  border-left-color: var(--mcq-accent-green);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--mcq-accent-green) 8%, var(--mcq-background)) 0%,
+    color-mix(in srgb, var(--mcq-accent-green) 3%, var(--mcq-background)) 100%
+  );
+  box-shadow: 0 8px 24px rgba(39, 116, 92, 0.12);
+}
+
+.mcq-feedback-incorrect {
+  border-left-color: var(--mcq-accent-red);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--mcq-accent-red) 8%, var(--mcq-background)) 0%,
+    color-mix(in srgb, var(--mcq-accent-red) 3%, var(--mcq-background)) 100%
+  );
+  box-shadow: 0 8px 24px rgba(189, 73, 63, 0.12);
+}
+
+.mcq-feedback-skipped {
+  border-left-color: var(--mcq-accent-blue);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--mcq-accent-blue) 8%, var(--mcq-background)) 0%,
+    color-mix(in srgb, var(--mcq-accent-blue) 3%, var(--mcq-background)) 100%
+  );
+  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.12);
+}
+
+.mcq-feedback-timed_out {
+  border-left-color: var(--mcq-accent-gold);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--mcq-accent-gold) 8%, var(--mcq-background)) 0%,
+    color-mix(in srgb, var(--mcq-accent-gold) 3%, var(--mcq-background)) 100%
+  );
+  box-shadow: 0 8px 24px rgba(233, 185, 73, 0.12);
+}
+
+@keyframes feedback-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feedback-content {
+  flex: 1;
+}
+
+.feedback-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.feedback-emoji {
+  font-size: 1.8rem;
+  animation: feedback-emoji-bounce 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes feedback-emoji-bounce {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.feedback-label {
+  color: var(--mcq-primary);
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.feedback-definition {
+  margin: 12px 0 0;
+  padding: 12px 0;
+}
+
+.feedback-definition p {
+  margin: 0;
+  color: var(--mcq-secondary);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.word-emphasis {
+  color: var(--mcq-primary);
+  font-weight: 900;
+  font-size: 1.05em;
+}
+
+.definition-text {
+  color: var(--mcq-secondary);
+}
+
+.reveal-countdown {
+  margin-top: 12px !important;
+  color: var(--mcq-secondary);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.reveal-countdown strong {
+  color: var(--mcq-primary);
+  font-weight: 900;
+}
+
+/* ============================================================================
+   ACTION BUTTONS
+   ============================================================================ */
+
+.mcq-next-button {
+  padding: 14px 24px;
+  background: linear-gradient(135deg, var(--mcq-accent-green), #20c997);
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 200ms ease;
+  box-shadow: 0 6px 20px rgba(39, 116, 92, 0.3);
+  flex-shrink: 0;
+}
+
+.mcq-next-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(39, 116, 92, 0.4);
+}
+
+.mcq-next-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(39, 116, 92, 0.3);
+}
+
+.mcq-next-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mcq-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: color-mix(in srgb, var(--mcq-border) 40%, var(--mcq-background));
+  border-radius: 12px;
+  border: 1px dashed var(--mcq-border);
+}
+
+.mcq-hint {
+  margin: 0;
+  color: var(--mcq-secondary);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.mcq-skip-button {
+  padding: 12px 20px;
+  background: transparent;
+  color: var(--mcq-primary);
+  border: 2px solid var(--mcq-border);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 200ms ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.mcq-skip-button:hover {
+  border-color: var(--mcq-accent-blue);
+  color: var(--mcq-accent-blue);
+  background: color-mix(in srgb, var(--mcq-accent-blue) 6%, var(--mcq-background));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(74, 144, 226, 0.2);
+}
+
+.mcq-skip-button:active {
+  transform: translateY(0);
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .mcq-shell {
+    gap: 24px;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.12);
+  }
+
+  .mcq-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .mcq-prompt {
+    font-size: 1.2rem;
+    padding: 20px;
+  }
+
+  .mcq-choice-button {
+    min-height: 56px;
+    padding: 14px 16px;
+    gap: 12px;
+    grid-template-columns: 40px 1fr auto;
+    font-size: 1rem;
+  }
+
+  .choice-indicator {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .mcq-feedback {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .mcq-next-button {
+    width: 100%;
+  }
+
+  .mcq-actions {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .mcq-skip-button {
+    width: 100%;
+  }
+
+  .mcq-timer {
+    padding: 10px 14px;
+    font-size: 1.2rem;
+  }
+
+  .mcq-timer .timer-display {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mcq-shell {
+    gap: 16px;
+    padding: 12px;
+  }
+
+  .mcq-prompt {
+    font-size: 1.1rem;
+    padding: 16px;
+  }
+
+  .mcq-choice-button {
+    grid-template-columns: 36px 1fr auto;
+  }
+
+  .choice-indicator {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+
+  .mcq-timer {
+    padding: 8px 12px;
+    font-size: 1rem;
+  }
+
+  .mcq-timer .timer-display {
+    font-size: 1.2rem;
+  }
+
+  .choice-mark {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+}

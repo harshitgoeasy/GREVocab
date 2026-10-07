@@ -1091,3 +1091,328 @@
     grid-template-columns: 1fr;
   }
 }
+
+.welcome-board {
+  --dashboard-ink: #202520;
+  --dashboard-muted: #66716a;
+  --dashboard-surface: #fffdf7;
+  --dashboard-edge: #d6ddd5;
+  --dashboard-green: #27745c;
+  --dashboard-amber: #e9b949;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  color: var(--dashboard-ink);
+  font-family: 'Avenir Next', 'Trebuchet MS', sans-serif;
+}
+
+.app-shell.dark .welcome-board {
+  --dashboard-ink: #f3f1e8;
+  --dashboard-muted: #b9c1ba;
+  --dashboard-surface: #202923;
+  --dashboard-edge: #44514a;
+  --dashboard-green: #69c59a;
+  --dashboard-amber: #e9b949;
+}
+
+.welcome-board .brand-bar {
+  position: relative;
+  inset: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 0 6px;
+  opacity: 1;
+  filter: none;
+  pointer-events: auto;
+  transform: none;
+  z-index: 1;
+}
+
+.dashboard-identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.welcome-board .app-logo {
+  flex: 0 0 68px;
+  width: 68px;
+  height: 68px;
+  border: 1px solid var(--dashboard-edge);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--dashboard-edge) 70%, transparent), 0 12px 22px rgba(0, 0, 0, 0.2);
+  object-fit: cover;
+  opacity: 1;
+}
+
+.welcome-board .eyebrow {
+  margin-bottom: 5px;
+  color: var(--dashboard-green);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.welcome-board .brand-bar h1 {
+  margin: 0;
+  color: var(--dashboard-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.dashboard-quiz-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 48px;
+  padding: 11px 17px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--dashboard-amber);
+  color: #25251f;
+  box-shadow: 0 5px 0 #a77c24, 0 12px 24px rgba(0, 0, 0, 0.2);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.dashboard-quiz-cta span {
+  font-size: 1.2rem;
+  transition: transform 150ms ease;
+}
+
+.dashboard-quiz-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 0 #a77c24, 0 16px 27px rgba(0, 0, 0, 0.24);
+}
+
+.dashboard-quiz-cta:hover span {
+  transform: translateX(3px);
+}
+
+.dashboard-quiz-cta:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #a77c24;
+}
+
+.welcome-board .stats-bar {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.welcome-board .stat-card,
+.welcome-board .summary-chip,
+.welcome-board .focus-panel,
+.welcome-board .group-board {
+  border: 1px solid var(--dashboard-edge);
+  border-radius: 8px;
+  background: var(--dashboard-surface);
+  color: var(--dashboard-ink);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--dashboard-edge) 70%, transparent), 0 14px 28px rgba(0, 0, 0, 0.16);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.welcome-board .stat-card:hover,
+.welcome-board .summary-chip:hover,
+.welcome-board .focus-panel:hover,
+.welcome-board .group-board:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--dashboard-green) 65%, var(--dashboard-edge));
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--dashboard-green) 24%, transparent), 0 19px 34px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-board .stat-card {
+  min-height: 112px;
+  padding: 18px;
+}
+
+.welcome-board .stat-card span,
+.welcome-board .summary-chip span {
+  color: var(--dashboard-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.welcome-board .stat-card strong,
+.welcome-board .summary-chip strong {
+  color: var(--dashboard-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.welcome-board .summary-strip {
+  gap: 12px;
+  margin: 0;
+}
+
+.welcome-board .summary-chip {
+  min-height: 82px;
+  justify-content: center;
+  padding: 14px 16px;
+}
+
+.welcome-board .focus-panel,
+.welcome-board .group-board {
+  padding: clamp(18px, 3vw, 27px);
+}
+
+.welcome-board .focus-panel {
+  border-left: 5px solid var(--dashboard-green);
+  background: linear-gradient(110deg, color-mix(in srgb, var(--dashboard-green) 11%, var(--dashboard-surface)), var(--dashboard-surface) 62%);
+}
+
+.welcome-board .section-header h2,
+.welcome-board .focus-panel h2 {
+  color: var(--dashboard-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.welcome-board .focus-description,
+.welcome-board .progress-meta {
+  color: var(--dashboard-muted);
+}
+
+.welcome-board .progress-meta strong {
+  color: var(--dashboard-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.welcome-board .progress-bar {
+  height: 9px;
+  background: color-mix(in srgb, var(--dashboard-edge) 60%, transparent);
+}
+
+.welcome-board .progress-bar span {
+  background: linear-gradient(90deg, var(--dashboard-green), var(--dashboard-amber));
+}
+
+.welcome-board .focus-badge,
+.welcome-board .group-label {
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--dashboard-green) 16%, transparent);
+  color: var(--dashboard-green);
+  letter-spacing: 0;
+}
+
+.welcome-board .group-grid {
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.welcome-board .group-card {
+  position: relative;
+  min-height: 130px;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--dashboard-edge);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--dashboard-surface) 90%, var(--dashboard-edge));
+  color: var(--dashboard-ink);
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.welcome-board .group-card:hover,
+.welcome-board .group-card.active {
+  transform: translateY(-3px);
+  border-color: var(--dashboard-green);
+  background: color-mix(in srgb, var(--dashboard-green) 9%, var(--dashboard-surface));
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--dashboard-green) 45%, transparent), 0 13px 20px rgba(0, 0, 0, 0.16);
+}
+
+.welcome-board .group-card strong {
+  color: var(--dashboard-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.12rem;
+  line-height: 1.15;
+}
+
+.welcome-board .group-card small,
+.welcome-board .group-card em {
+  color: var(--dashboard-muted);
+  font-size: 0.78rem;
+}
+
+.welcome-board .group-card:focus-visible,
+.dashboard-quiz-cta:focus-visible {
+  outline: 3px solid var(--dashboard-amber);
+  outline-offset: 3px;
+}
+
+.app-shell.dark .welcome-board .stat-card span,
+.app-shell.dark .welcome-board .summary-chip span,
+.app-shell.dark .welcome-board .focus-description,
+.app-shell.dark .welcome-board .progress-meta,
+.app-shell.dark .welcome-board .group-card small,
+.app-shell.dark .welcome-board .group-card em {
+  color: var(--dashboard-muted);
+}
+
+@media (max-width: 768px) {
+  .welcome-board .brand-bar {
+    align-items: flex-start;
+  }
+
+  .welcome-board .app-logo {
+    width: 56px;
+    height: 56px;
+    flex-basis: 56px;
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 560px) {
+  .welcome-board .brand-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .dashboard-quiz-cta {
+    width: 100%;
+  }
+
+  .welcome-board .stats-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .welcome-board .group-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-board .stat-card,
+  .welcome-board .summary-chip,
+  .welcome-board .focus-panel,
+  .welcome-board .group-board,
+  .welcome-board .group-card,
+  .dashboard-quiz-cta,
+  .dashboard-quiz-cta span {
+    transition: none;
+  }
+
+  .welcome-board .stat-card:hover,
+  .welcome-board .summary-chip:hover,
+  .welcome-board .focus-panel:hover,
+  .welcome-board .group-board:hover,
+  .welcome-board .group-card:hover,
+  .dashboard-quiz-cta:hover {
+    transform: none;
+  }
+}
