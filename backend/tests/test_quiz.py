@@ -80,6 +80,28 @@ class QuizRouteTests(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app)
 
+    def test_group_routes_support_api_and_unprefixed_paths_without_redirects(self):
+        api_response = self.client.get('/api/groups', follow_redirects=False)
+        unprefixed_response = self.client.get('/groups', follow_redirects=False)
+
+        self.assertEqual(api_response.status_code, 200)
+        self.assertEqual(unprefixed_response.status_code, 200)
+        self.assertEqual(api_response.json(), unprefixed_response.json())
+
+    def test_vercel_preflight_is_allowed_without_credentials(self):
+        response = self.client.options(
+            '/api/quiz',
+            headers={
+                'Origin': 'https://gre-vocab-preview.vercel.app',
+                'Access-Control-Request-Method': 'POST',
+                'Access-Control-Request-Headers': 'content-type',
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['access-control-allow-origin'], '*')
+        self.assertNotIn('access-control-allow-credentials', response.headers)
+
     def test_quiz_endpoint_returns_question_contract(self):
         response = self.client.post('/api/quiz', json={
             'group_ids': [1],

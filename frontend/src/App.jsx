@@ -13,15 +13,17 @@ const PLAYER_NAME_KEY = 'gre-vocab-name'
 const SELECTED_GROUP_KEY = 'gre-vocab-selected-group'
 const STREAK_KEY = 'gre-study-streak'
 const THEME_KEY = 'gre-vocab-theme'
-const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
-const API_BASE_URL = (
-  /^https?:\/\//i.test(configuredApiBaseUrl)
-    ? configuredApiBaseUrl
-    : `https://${configuredApiBaseUrl}`
+const configuredApiUrl = import.meta.env.VITE_API_URL || (
+  import.meta.env.DEV ? 'http://localhost:8000' : 'https://grevocab-l7su.onrender.com'
+)
+const API_BASE = (
+  /^https?:\/\//i.test(configuredApiUrl)
+    ? configuredApiUrl
+    : `https://${configuredApiUrl}`
 ).replace(/\/+$/, '')
 
 const fetchJson = async (url) => {
-  const response = await fetch(url)
+  const response = await fetch(url, { credentials: 'omit' })
   if (!response.ok) {
     throw new Error(`Request failed with status ${response.status}`)
   }
@@ -155,7 +157,7 @@ function App() {
     setTheme(savedTheme)
     setDashboardState((current) => ({ ...current, selectedGroup: savedSelectedGroup }))
 
-    fetchJson(`${API_BASE_URL}/api/groups`)
+    fetchJson(`${API_BASE}/api/groups`)
       .then((data) => {
         const nextGroups = Array.isArray(data) ? data : []
         setGroups(nextGroups)
@@ -178,7 +180,7 @@ function App() {
 
   useEffect(() => {
     if (dashboardState.activeView !== 'READER' && dashboardState.activeView !== 'GROUP_DETAIL') return
-    fetchJson(`${API_BASE_URL}/api/groups/${dashboardState.selectedGroup}/words`)
+    fetchJson(`${API_BASE}/api/groups/${dashboardState.selectedGroup}/words`)
       .then((data) => setReaderWords(Array.isArray(data) ? data : []))
       .catch(() => setReaderWords([]))
   }, [dashboardState.activeView, dashboardState.selectedGroup])
@@ -216,9 +218,10 @@ function App() {
         return
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/quiz`, {
+      const response = await fetch(`${API_BASE}/api/quiz`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'omit',
         body: JSON.stringify({ group_ids: groupIds, question_count: questionCount }),
       })
       const payload = await response.json()
